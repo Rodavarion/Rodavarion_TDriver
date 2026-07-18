@@ -11,41 +11,61 @@ permissions:
   contents: read
 
 concurrency:
-  group: linux-ci-${{ github.ref }}
+  group: linux-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build-and-test:
-    name: Ubuntu 24.04 · GCC · Qt 6
+    name: Arch Linux · GCC · Qt 6
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    container:
+      image: archlinux:latest
+
+    timeout-minutes: 35
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install build dependencies
+      - name: Install Arch Linux toolchain
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          set -euo pipefail
+          pacman -Syu --noconfirm --needed \
+            git \
+            base-devel \
             cmake \
-            ninja-build \
-            g++ \
-            pkg-config \
-            qt6-base-dev \
-            libudev-dev \
-            libhidapi-dev \
-            libevdev-dev
+            ninja \
+            pkgconf \
+            qt6-base \
+            hidapi \
+            libevdev
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Show toolchain versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcc --version | head -n 1
+          cmake --version | head -n 1
+          ninja --version
+          qmake6 --version
+          pkg-config --modversion Qt6Core
+          pkg-config --modversion hidapi-hidraw || pkg-config --modversion hidapi-libusb || true
+          pkg-config --modversion libevdev
 
       - name: Configure
-        run: >-
-          cmake -S . -B build -G Ninja
-          -DCMAKE_BUILD_TYPE=Release
-          -DRODAVARION_BUILD_TESTS=ON
-          -DRODAVARION_WARNINGS_AS_ERRORS=OFF
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DRODAVARION_BUILD_TESTS=ON \
+            -DRODAVARION_WARNINGS_AS_ERRORS=OFF
 
       - name: Build
+        shell: bash
         run: cmake --build build --parallel 2
 
       - name: Test
+        shell: bash
         run: ctest --test-dir build --output-on-failure

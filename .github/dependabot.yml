@@ -9,3 +9,4 @@ updates:
       - "github-actions"
     commit-message:
       prefix: "chore"
+    open-pull-requests-limit: 5
