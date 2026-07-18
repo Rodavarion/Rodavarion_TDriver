@@ -1,11 +1,94 @@
-# Rodavarion TDriver 1.0.0 Stable
+<div align="center">
 
+<img src="packaging/icons/rodavarion-tdriver.svg" alt="Rodavarion TDriver logo" width="128" height="128">
 
-Context-aware peripheral and mouse-button management for Linux.
+# Rodavarion TDriver
 
-**Open Source · MIT License · Made in Ukraine**
+**Context-aware peripheral and mouse-button management for Linux**  
+**Контекстне керування периферією та кнопками миші для Linux**
 
-Rodavarion TDriver is currently developed by a **veteran enthusiast**. Rodavarion Technologies is in the process of being established. See [SUPPORT.md](SUPPORT.md) for voluntary support and other ways to contribute.
+[![Linux CI](https://github.com/Rodavarion/Rodavarion_TDriver/actions/workflows/linux-build.yml/badge.svg?branch=main)](https://github.com/Rodavarion/Rodavarion_TDriver/actions/workflows/linux-build.yml)
+[![Release](https://img.shields.io/github/v/release/Rodavarion/Rodavarion_TDriver?display_name=tag&sort=semver)](https://github.com/Rodavarion/Rodavarion_TDriver/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](CMakeLists.txt)
+[![Qt 6](https://img.shields.io/badge/Qt-6-41CD52.svg)](CMakeLists.txt)
+[![Platform: Linux](https://img.shields.io/badge/platform-Linux-lightgrey.svg)](#system-requirements--системні-вимоги)
+
+[Installation](#installation--встановлення) · [Architecture](docs/ARCHITECTURE.md) · [Roadmap](ROADMAP.md) · [Contributing](CONTRIBUTING.md) · [Security](docs/SECURITY.md) · [Українська](#український-опис)
+
+</div>
+
+> **Stable release:** 1.0.0  
+> **License:** MIT  
+> **Primary platform:** Arch Linux; the core is designed for broader Linux support.
+
+Rodavarion TDriver is an open-source C++20/Qt 6 platform for detecting Linux peripherals, classifying their capabilities, managing context-aware mouse mappings, and safely maintaining optional device dependencies.
+
+## Highlights · Основні можливості
+
+- Physical-device discovery and grouping across HID, USB, Bluetooth and serial transports.
+- Context-aware mouse actions for terminals, IDEs and desktop applications.
+- Native keyboard-output backend through `/dev/uinput`, with Wayland/X11 fallbacks.
+- Conservative dependency maintenance backed by a package ledger.
+- Qt Widgets GUI, background daemon, CLI, tests and Linux packaging assets.
+- Arch Linux installation scripts with explicit preflight, build, test and uninstall stages.
+
+## Installation · Встановлення
+
+### Arch Linux — stable installation
+
+```bash
+chmod +x install.sh tools/*.sh
+./install.sh --edition full
+```
+
+Minimal edition:
+
+```bash
+./install.sh --edition minimal
+```
+
+### Developer build
+
+```bash
+chmod +x tools/*.sh
+./tools/preflight_arch.sh --edition full
+./tools/build_arch.sh
+./tools/run_arch.sh
+```
+
+## System requirements · Системні вимоги
+
+- Linux with a graphical session;
+- CMake 3.22 or newer;
+- C++20 compiler;
+- Qt 6.5 or newer (`Core`, `DBus`, `Widgets`);
+- HIDAPI and libevdev;
+- systemd/udev and Polkit for full desktop integration.
+
+## Repository structure · Структура репозиторію
+
+| Path | Purpose |
+|---|---|
+| `include/rodavarion/` | Public C++ interfaces |
+| `src/` | Core, runtime, GUI, daemon and CLI implementations |
+| `tests/` | Automated tests |
+| `tools/` | Arch Linux development and installation scripts |
+| `packaging/` | Desktop, systemd, udev, icons and KWin assets |
+| `docs/` | Architecture, security and dependency documentation |
+| `.github/` | CI, release automation and contribution templates |
+
+## Project status · Стан проєкту
+
+Version **1.0.0 Stable** is the first public release. Development is currently led by **DevSwiftPro**, a Ukrainian veteran enthusiast. Rodavarion Technologies is being established. Contributions and responsible issue reports are welcome.
+
+## Український опис
+
+Rodavarion TDriver — відкрита платформа на C++20 і Qt 6 для виявлення периферійних пристроїв Linux, визначення їхніх можливостей, контекстного перепризначення кнопок миші та безпечного керування додатковими залежностями.
+
+---
+
+## Detailed documentation · Детальна документація
 
 ## Full edition тепер справді «повна»
 
@@ -148,3 +231,4 @@ Alpha 9 встановлює SVG та PNG-іконки різних розмір
 ## Direct keyboard backend (Beta 8.2)
 
 Keyboard shortcuts are now emitted by Rodavarion TDriver itself through a dedicated virtual keyboard on `/dev/uinput`. This is the primary backend on both Wayland and X11. `ydotool`, `wtype`, and `xdotool` remain fallback options only. The terminal context profile maps Copy/Paste to `Ctrl+Shift+C` and `Ctrl+Shift+V`.
+

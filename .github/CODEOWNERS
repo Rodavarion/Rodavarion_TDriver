@@ -1,0 +1,9 @@
+# Default owner for the entire repository
+* @DevSwiftPro
+
+# Sensitive project automation and packaging
+/.github/ @DevSwiftPro
+/CMakeLists.txt @DevSwiftPro
+/install.sh @DevSwiftPro
+/tools/ @DevSwiftPro
+/packaging/ @DevSwiftPro
