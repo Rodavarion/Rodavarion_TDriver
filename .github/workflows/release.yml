@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   source-release:
     name: Create verified source archives
@@ -41,6 +45,7 @@ jobs:
           git archive --format=zip --prefix="$project/" -o "dist/$project.zip" HEAD
           cd dist
           sha256sum "$project.tar.gz" "$project.zip" > SHA256SUMS.txt
+          sha256sum --check SHA256SUMS.txt
 
       - name: Publish GitHub release
         env:
@@ -50,7 +55,7 @@ jobs:
           set -euo pipefail
           gh release create "$GITHUB_REF_NAME" \
             dist/* \
-            --title "Rodavarion TDriver ${GITHUB_REF_NAME#v}" \
+            --title "Rodavarion TDriver ${GITHUB_REF_NAME#v} Stable" \
             --notes-file RELEASE_NOTES_1.0.0.md \
             --verify-tag \
             --latest
