@@ -1,0 +1,22 @@
+[Unit]
+Description=Rodavarion TDriver headless peripheral service
+Documentation=file:///usr/share/doc/rodavarion-tdriver/README.md
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/rodavarion-tdriverd
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config %h/.local/share %h/.cache
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=default.target

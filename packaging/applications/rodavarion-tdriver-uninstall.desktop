@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Видалити Rodavarion TDriver
+GenericName=Деінсталятор
+Comment=Безпечне видалення Rodavarion TDriver
+TryExec=@UNINSTALLER@
+Exec=@UNINSTALLER@
+Icon=@UNINSTALL_ICON@
+Terminal=true
+Categories=Settings;
+NoDisplay=false
+StartupNotify=true
+Keywords=Rodavarion;uninstall;remove;видалити;деінсталяція;
+X-KDE-SubstituteUID=false

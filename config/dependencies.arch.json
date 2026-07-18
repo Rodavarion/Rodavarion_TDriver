@@ -1,0 +1,161 @@
+{
+  "schema_version": 3,
+  "platform": "arch-linux",
+  "policy": {
+    "install_silently": false,
+    "require_user_confirmation": true,
+    "privilege_frontend": "pkexec-or-sudo",
+    "package_manager": "pacman",
+    "allow_aur": false,
+    "allow_arbitrary_package_names": false
+  },
+  "editions": {
+    "minimal": {
+      "description_uk": "Headless/server edition: служба без графічного інтерфейсу з мінімальним набором для HID, evdev і призначених дій.",
+      "profiles": [
+        "build-minimal",
+        "runtime-core"
+      ]
+    },
+    "full": {
+      "description_uk": "Повна GUI-версія з основними залежностями для мишей, клавіатур, друку, сканування та Bluetooth.",
+      "profiles": [
+        "build-full",
+        "runtime-core",
+        "printing",
+        "scanning",
+        "bluetooth",
+        "network-discovery",
+        "smartcard-rfid",
+        "camera-audio",
+        "diagnostics"
+      ]
+    }
+  },
+  "profiles": {
+    "build-minimal": {
+      "packages": [
+        "base-devel",
+        "cmake",
+        "ninja",
+        "qt6-base",
+        "hidapi",
+        "libevdev"
+      ]
+    },
+    "build-full": {
+      "packages": [
+        "base-devel",
+        "cmake",
+        "ninja",
+        "qt6-base",
+        "hidapi",
+        "libevdev"
+      ]
+    },
+    "runtime-core": {
+      "packages": [
+        "polkit",
+        "ydotool",
+        "xdotool",
+        "wtype",
+        "usbutils",
+        "libusb",
+        "pciutils"
+      ],
+      "services_user": [
+        "ydotool.service",
+        "rodavarion-tdriverd.service"
+      ],
+      "kernel_modules": [
+        "uinput"
+      ]
+    },
+    "printing": {
+      "packages": [
+        "cups",
+        "cups-filters",
+        "ghostscript",
+        "poppler",
+        "qpdf"
+      ],
+      "services_system": [
+        "cups.service"
+      ]
+    },
+    "scanning": {
+      "packages": [
+        "sane",
+        "sane-airscan",
+        "libieee1284"
+      ]
+    },
+    "bluetooth": {
+      "packages": [
+        "bluez",
+        "bluez-utils"
+      ],
+      "services_system": [
+        "bluetooth.service"
+      ]
+    },
+    "serial": {
+      "packages": [
+        "libserialport"
+      ]
+    },
+    "rare-vendor-drivers": {
+      "packages": []
+    },
+    "network-discovery": {
+      "packages": [
+        "avahi",
+        "nss-mdns"
+      ],
+      "services_system": [
+        "avahi-daemon.service"
+      ]
+    },
+    "smartcard-rfid": {
+      "packages": [
+        "pcsclite",
+        "ccid"
+      ],
+      "services_system": [
+        "pcscd.socket"
+      ]
+    },
+    "camera-audio": {
+      "packages": [
+        "v4l-utils",
+        "pipewire",
+        "wireplumber"
+      ]
+    },
+    "diagnostics": {
+      "packages": [
+        "lsof",
+        "strace",
+        "dmidecode",
+        "hwdata",
+        "iproute2"
+      ]
+    }
+  },
+  "protected_packages": [
+    "base",
+    "base-devel",
+    "glibc",
+    "gcc",
+    "linux",
+    "linux-lts",
+    "pacman",
+    "systemd",
+    "qt6-base",
+    "cmake",
+    "ninja",
+    "polkit",
+    "hidapi",
+    "libevdev"
+  ]
+}

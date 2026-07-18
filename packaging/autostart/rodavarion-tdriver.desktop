@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Rodavarion TDriver
+Comment=Автоматичний запуск менеджера кнопок миші
+TryExec=@EXECUTABLE@
+Exec=@EXECUTABLE@ --tray
+Icon=@ICON@
+Terminal=false
+Categories=Settings;HardwareSettings;
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel

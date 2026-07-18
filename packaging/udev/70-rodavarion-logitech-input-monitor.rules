@@ -1,0 +1,3 @@
+# Read-only desktop-session access for Logitech input event devices.
+# This does not grant write access to HID firmware/configuration interfaces.
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{id/vendor}=="046d", TAG+="uaccess"

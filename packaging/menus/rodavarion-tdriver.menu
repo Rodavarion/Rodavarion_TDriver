@@ -1,0 +1,11 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN" "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+<Menu>
+  <Name>Applications</Name>
+  <Menu>
+    <Name>Rodavarion TDriver</Name>
+    <Directory>rodavarion-tdriver.directory</Directory>
+    <Include>
+      <Category>Rodavarion</Category>
+    </Include>
+  </Menu>
+</Menu>

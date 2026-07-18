@@ -1,0 +1,4 @@
+# Rodavarion TDriver: active desktop user access for Logitech input devices
+# and uinput, needed by safe grab-and-relay remapping.
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{id/vendor}=="046d", TAG+="uaccess"
+KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"

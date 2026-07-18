@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Rodavarion TDriver
+GenericName=Центр керування периферією
+Comment=Керування периферійними пристроями та кнопками миші
+TryExec=@EXECUTABLE@
+Exec=@EXECUTABLE@
+Icon=@ICON@
+Terminal=false
+Categories=Settings;HardwareSettings;
+StartupNotify=true
+StartupWMClass=Rodavarion TDriver
+Keywords=Rodavarion;TDriver;driver;mouse;peripheral;миша;драйвер;
+X-KDE-SubstituteUID=false

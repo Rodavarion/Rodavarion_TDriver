@@ -1,0 +1,37 @@
+name: Bug report
+description: Повідомити про помилку в Rodavarion_TDriver
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Опис помилки
+      description: Що сталося і що мало статися?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Кроки відтворення
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Версія
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: ОС і середовище
+      placeholder: Arch Linux, KDE Plasma, GCC...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи або повідомлення термінала
+      render: shell

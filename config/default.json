@@ -1,0 +1,78 @@
+{
+  "application": {
+    "name": "Rodavarion TDriver",
+    "version": "1.0.0",
+    "language": "auto"
+  },
+  "company": {
+    "name": "Rodavarion Technologies",
+    "motto": "Rooted in Heritage. Engineered for the Future."
+  },
+  "gui": {
+    "theme": "rodavarion-dark",
+    "restore_window_geometry": true,
+    "localization": [
+      "uk",
+      "en"
+    ]
+  },
+  "platform": {
+    "dependency_manifest": "config/dependencies.arch.json",
+    "automatic_runtime_check": true,
+    "offer_missing_dependencies": true,
+    "silent_privilege_escalation": false
+  },
+  "devices": {
+    "hid_discovery": true,
+    "evdev_monitoring": true,
+    "physical_grouping": true,
+    "capability_classification": true,
+    "privacy_mode": true,
+    "mock_devices": false
+  },
+  "actions": {
+    "mapping": true,
+    "runtime_standard_actions": true,
+    "safe_script_execution": true,
+    "script_timeout_seconds": 10,
+    "exclusive_auxiliary_button_capture": true,
+    "grab_primary_pointer_interface": false,
+    "hardware_writes": false,
+    "firmware_writes": false
+  },
+  "dependency_profiles": {
+    "startup": [
+      "base",
+      "printing",
+      "scanning",
+      "bluetooth"
+    ],
+    "on_demand": [
+      "serial",
+      "rare-vendor-drivers"
+    ]
+  },
+  "architecture": {
+    "input": "backend -> normalized event",
+    "actions": "action engine",
+    "output": "platform adapter",
+    "stage": "stable"
+  },
+  "runtime_service": {
+    "enabled_by_default": true,
+    "service_name": "rodavarion-tdriverd.service",
+    "gui_is_optional": true,
+    "fail_safe_native_device_behavior": true,
+    "onboard_memory_writes": false
+  },
+  "dependency_maintenance": {
+    "package_ledger": "~/.local/share/rodavarion-tdriver/package-ledger.arch.json",
+    "feature_state": "~/.config/rodavarion-tdriver/enabled-features.json",
+    "remove_preexisting_packages": false,
+    "remove_packages_with_reverse_dependencies": false,
+    "protected_package_policy": true,
+    "auto_detect_device_profiles": true,
+    "offer_reinstall_on_new_device": true
+  },
+  "version": "1.0.0"
+}

@@ -1,0 +1,17 @@
+name: Feature request
+description: Запропонувати покращення для Rodavarion_TDriver
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Яку проблему потрібно вирішити?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Запропоноване рішення
+    validations:
+      required: true
