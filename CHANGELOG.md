@@ -1,3 +1,12 @@
+## 1.0.1 — Runtime Correctness Hotfix
+
+- Fixed `DeviceControl::Unknown` so unsupported events are rejected instead of being interpreted as the left mouse button.
+- Fixed `Disabled` mappings so side-button events are suppressed rather than passed through to the desktop.
+- Preserved the native system behavior for mappings set to `Default`.
+- Added an in-memory mappings cache that reloads only when the mappings file, device key, modification time, or file size changes.
+- Added clearer runtime diagnostics for `Default`, `Disabled`, and rejected unknown events.
+- Added a testable `ActionEngine` constructor with an explicit mappings-file path.
+
 ## 1.0.0 — Stable
 
 - Promoted the verified RC1.2 architecture to the first stable release.

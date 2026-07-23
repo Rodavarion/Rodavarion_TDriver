@@ -43,11 +43,10 @@ void MouseRuntimeController::start(
                 || mapping.button == action::MouseButton::Extra1
                 || mapping.button == action::MouseButton::Extra2;
 
-            const bool remapped =
-                mapping.action != action::ActionType::Default
-                && mapping.action != action::ActionType::Disabled;
+            const bool requiresSuppression =
+                mapping.action != action::ActionType::Default;
 
-            if (sideButton && remapped) {
+            if (sideButton && requiresSuppression) {
                 needsSideButtonSuppression = true;
                 break;
             }

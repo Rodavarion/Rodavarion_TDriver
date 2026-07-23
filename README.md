@@ -4,7 +4,7 @@
 
 # Rodavarion TDriver
 
-**Context-aware peripheral and mouse-button management for Linux**  
+**Context-aware peripheral and mouse-button management for Linux**
 **Контекстне керування периферією та кнопками миші для Linux**
 
 [![Linux CI](https://github.com/Rodavarion/Rodavarion_TDriver/actions/workflows/linux-build.yml/badge.svg?branch=main)](https://github.com/Rodavarion/Rodavarion_TDriver/actions/workflows/linux-build.yml)
@@ -18,8 +18,8 @@
 
 </div>
 
-> **Stable release:** 1.0.0  
-> **License:** MIT  
+> **Stable release:** 1.0.1
+> **License:** MIT
 > **Primary platform:** Arch Linux; the core is designed for broader Linux support.
 
 Rodavarion TDriver is an open-source C++20/Qt 6 platform for detecting Linux peripherals, classifying their capabilities, managing context-aware mouse mappings, and safely maintaining optional device dependencies.
@@ -80,7 +80,7 @@ chmod +x tools/*.sh
 
 ## Project status · Стан проєкту
 
-Version **1.0.0 Stable** is the first public release. Development is currently led by **DevSwiftPro**, a Ukrainian veteran enthusiast. Rodavarion Technologies is being established. Contributions and responsible issue reports are welcome.
+Version **1.0.1 Stable** is the current public release; it contains critical runtime correctness and latency fixes over 1.0.0. Development is currently led by **DevSwiftPro**, a Ukrainian veteran enthusiast. Rodavarion Technologies is being established. Contributions and responsible issue reports are welcome.
 
 ## Український опис
 

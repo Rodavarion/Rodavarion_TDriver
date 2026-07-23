@@ -56,6 +56,6 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             dist/* \
             --title "Rodavarion TDriver ${GITHUB_REF_NAME#v} Stable" \
-            --notes-file RELEASE_NOTES_1.0.0.md \
+            --notes-file "RELEASE_NOTES_${GITHUB_REF_NAME#v}.md" \
             --verify-tag \
             --latest

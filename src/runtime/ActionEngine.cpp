@@ -1,11 +1,26 @@
 #include "rodavarion/runtime/ActionEngine.hpp"
+
 #include "rodavarion/action/MouseMappingStore.hpp"
 #include "rodavarion/safety/ActionSafetyPolicy.hpp"
+
+#include <QFileInfo>
+
+#include <utility>
 
 namespace rodavarion::runtime {
 
 ActionEngine::ActionEngine(IOutputEngine& outputEngine)
-    : outputEngine_(outputEngine) {}
+    : ActionEngine(
+        outputEngine,
+        action::MouseMappingStore::defaultFilePath()
+    ) {}
+
+ActionEngine::ActionEngine(
+    IOutputEngine& outputEngine,
+    QString mappingsFilePath
+)
+    : outputEngine_(outputEngine),
+      mappingsFilePath_(std::move(mappingsFilePath)) {}
 
 OutputResult ActionEngine::dispatch(
     const device::PeripheralDescriptor& peripheral,
@@ -15,28 +30,33 @@ OutputResult ActionEngine::dispatch(
         return {.success = true, .message = "Подію відпускання пропущено."};
     }
 
-    action::MouseMappingStore store;
-    const auto loaded = store.load(
-        action::MouseMappingStore::defaultFilePath(),
-        peripheral.physicalDevice.key
-    );
-
-    if (!loaded) {
+    const auto button = mappingButton(event.control);
+    if (!button.has_value()) {
         return {
             .success = false,
-            .message = QString::fromStdString(loaded.error())
+            .message = "Невідома подія пристрою відхилена."
         };
     }
 
-    const auto button = mappingButton(event.control);
-    for (const auto& mapping : loaded.value().mappings) {
-        if (mapping.button != button) {
+    QString cacheError;
+    if (!refreshCacheIfNeeded(
+            peripheral.physicalDevice.key,
+            cacheError
+        )) {
+        return {.success = false, .message = cacheError};
+    }
+
+    for (const auto& mapping : cachedProfile_->mappings) {
+        if (mapping.button != *button) {
             continue;
         }
 
-        if (mapping.action == action::ActionType::Default
-            || mapping.action == action::ActionType::Disabled) {
-            return {.success = true, .message = "Дію не призначено."};
+        if (mapping.action == action::ActionType::Default) {
+            return {.success = true, .message = "Використано системну дію."};
+        }
+
+        if (mapping.action == action::ActionType::Disabled) {
+            return {.success = true, .message = "Кнопку вимкнено."};
         }
 
         const auto safety =
@@ -57,7 +77,42 @@ OutputResult ActionEngine::dispatch(
     return {.success = true, .message = "Відповідного призначення немає."};
 }
 
-action::MouseButton ActionEngine::mappingButton(
+bool ActionEngine::refreshCacheIfNeeded(
+    const std::string& deviceKey,
+    QString& errorMessage
+) {
+    const QFileInfo fileInfo(mappingsFilePath_);
+    const bool exists = fileInfo.exists();
+    const auto lastModified = exists ? fileInfo.lastModified() : QDateTime{};
+    const qint64 fileSize = exists ? fileInfo.size() : -1;
+
+    const bool cacheIsCurrent =
+        cachedProfile_.has_value()
+        && cachedDeviceKey_ == deviceKey
+        && cachedFileExists_ == exists
+        && cachedLastModified_ == lastModified
+        && cachedFileSize_ == fileSize;
+
+    if (cacheIsCurrent) {
+        return true;
+    }
+
+    action::MouseMappingStore store;
+    auto loaded = store.load(mappingsFilePath_, deviceKey);
+    if (!loaded) {
+        errorMessage = QString::fromStdString(loaded.error());
+        return false;
+    }
+
+    cachedProfile_ = std::move(loaded.value());
+    cachedDeviceKey_ = deviceKey;
+    cachedFileExists_ = exists;
+    cachedLastModified_ = lastModified;
+    cachedFileSize_ = fileSize;
+    return true;
+}
+
+std::optional<action::MouseButton> ActionEngine::mappingButton(
     const input::DeviceControl control
 ) noexcept {
     switch (control) {
@@ -73,9 +128,9 @@ action::MouseButton ActionEngine::mappingButton(
         case input::DeviceControl::VerticalWheelDown: return action::MouseButton::WheelDown;
         case input::DeviceControl::HorizontalWheelLeft: return action::MouseButton::WheelLeft;
         case input::DeviceControl::HorizontalWheelRight: return action::MouseButton::WheelRight;
-        case input::DeviceControl::Unknown: return action::MouseButton::Left;
+        case input::DeviceControl::Unknown: return std::nullopt;
     }
-    return action::MouseButton::Left;
+    return std::nullopt;
 }
 
 } // namespace rodavarion::runtime
