@@ -18,7 +18,7 @@
 
 </div>
 
-> **Stable release:** 1.0.1
+> **Stable release:** 1.1.5
 > **License:** MIT
 > **Primary platform:** Arch Linux; the core is designed for broader Linux support.
 

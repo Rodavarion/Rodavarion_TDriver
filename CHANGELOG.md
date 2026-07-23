@@ -1,3 +1,13 @@
+# Changelog
+
+## 1.1.5 Stable
+
+- Corrected release numbering after the mistakenly published 1.0.1 package.
+- Fixed disabled side-button suppression and unknown-control handling.
+- Cached mouse mappings in the runtime hot path.
+- Removed one proven obsolete duplicate udev rule.
+- Added a repository linkage and cleanup audit.
+
 ## 1.0.1 — Runtime Correctness Hotfix
 
 - Fixed `DeviceControl::Unknown` so unsupported events are rejected instead of being interpreted as the left mouse button.
