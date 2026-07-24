@@ -188,28 +188,15 @@ if [[ "$EDITION" == "full" ]]; then
     install_managed 644 "${ROOT_DIR}/packaging/kwin/rodavarion-context/metadata.json" "${KWIN_SCRIPT_ROOT}/metadata.json"
     install_managed 644 "${ROOT_DIR}/packaging/kwin/rodavarion-context/contents/code/main.js" "${KWIN_SCRIPT_ROOT}/contents/code/main.js"
 
+    # За правилом Rodavarion інсталятор не створює ярлик на робочому столі.
+    # Прибираємо ярлики, які могли залишитися від старих версій.
     desktop_dir=""
     if command -v xdg-user-dir >/dev/null 2>&1; then
         desktop_dir="$(xdg-user-dir DESKTOP 2>/dev/null || true)"
     fi
-    if [[ -z "$desktop_dir" || "$desktop_dir" == "$HOME" ]]; then
-        [[ -d "${HOME}/Робочий стіл" ]] && desktop_dir="${HOME}/Робочий стіл" || desktop_dir="${HOME}/Desktop"
-    fi
-    install -d "$desktop_dir"
-    desktop_launcher="${desktop_dir}/Rodavarion-TDriver.desktop"
-    install_managed 755 "$APP_DESKTOP" "$desktop_launcher"
-
-    # Прибираємо стару назву ярлика, щоб Plasma не показувала застарілий
-    # білий файл поруч із новим коректним launcher-файлом.
-    rm -f -- "${desktop_dir}/Rodavarion TDriver.desktop" \
-        "${HOME}/Desktop/Rodavarion TDriver.desktop" \
-        "${HOME}/Desktop/Rodavarion-TDriver.desktop" \
-        "${HOME}/Робочий стіл/Rodavarion TDriver.desktop" \
-        "${HOME}/Робочий стіл/Rodavarion-TDriver.desktop"
-
-    # GNOME використовує metadata::trusted; KDE покладається насамперед на
-    # виконуваний біт і коректний Desktop Entry. Обидва варіанти підтримано.
-    command -v gio >/dev/null 2>&1 && gio set "$desktop_launcher" metadata::trusted true >/dev/null 2>&1 || true
+    for old_desktop in         "${HOME}/Desktop/Rodavarion TDriver.desktop"         "${HOME}/Desktop/Rodavarion-TDriver.desktop"         "${HOME}/Робочий стіл/Rodavarion TDriver.desktop"         "${HOME}/Робочий стіл/Rodavarion-TDriver.desktop"         "${desktop_dir}/Rodavarion TDriver.desktop"         "${desktop_dir}/Rodavarion-TDriver.desktop"; do
+        [[ -n "$old_desktop" ]] && rm -f -- "$old_desktop"
+    done
 fi
 
 if [[ "$EDITION" == "minimal" ]]; then
@@ -326,11 +313,10 @@ verify_desktop_entry() {
 if [[ "$EDITION" == "full" ]]; then
     verify_desktop_entry "$APP_DESKTOP" "${HOME}/.local/bin/rodavarion-tdriver" "$APP_ICON"
     verify_desktop_entry "$UNINSTALL_DESKTOP" "${HOME}/.local/bin/rodavarion-tdriver-uninstall" "$UNINSTALL_ICON"
-    verify_desktop_entry "$desktop_launcher" "${HOME}/.local/bin/rodavarion-tdriver" "$APP_ICON"
     verify_file "$AUTOSTART_DESKTOP" "файл автозапуску"
     grep -Fqx "Exec=${HOME}/.local/bin/rodavarion-tdriver --tray" "$AUTOSTART_DESKTOP" || { echo "ПОМИЛКА: некоректний Exec у файлі автозапуску" >&2; exit 1; }
     if command -v desktop-file-validate >/dev/null 2>&1; then desktop-file-validate "$AUTOSTART_DESKTOP"; fi
-    echo "Перевірка інтеграції: GUI, автозапуск у треї, ярлики, іконки, деінсталятор і меню встановлено коректно."
+    echo "Перевірка інтеграції: GUI, автозапуск у треї, меню програм, іконки та деінсталятор встановлено коректно."
 fi
 
 echo

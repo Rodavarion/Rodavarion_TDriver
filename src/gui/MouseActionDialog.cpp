@@ -813,7 +813,7 @@ void MouseActionDialog::startSelectedMonitors() {
             std::make_unique<input::EvdevMouseMonitor>();
         connectMonitor(*monitor);
 
-        if (monitor->start(path)) {
+        if (monitor->start(path, true, true)) {
             ++started;
             appendTestMessage(
                 "[SAFE] "

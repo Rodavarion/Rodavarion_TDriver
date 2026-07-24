@@ -113,7 +113,25 @@ DeviceCapabilityClassifier::classify(
                 DeviceCapability::DuplexScan
             );
         }
-    } else if (containsAny(product, {"gamepad", "controller"})) {
+    } else if (containsAny(product, {"hotas", "flight stick", "flightstick", "throttle quadrant", "yoke"})) {
+        result.deviceClass = DeviceClass::FlightController;
+        result.capabilities = {DeviceCapability::Buttons,DeviceCapability::Axes,DeviceCapability::Triggers,DeviceCapability::ForceFeedback,DeviceCapability::Calibration,DeviceCapability::Profiles,DeviceCapability::ApplicationRules,DeviceCapability::Diagnostics};
+    } else if (containsAny(product, {"rudder", "pedal", "pedals"})) {
+        result.deviceClass = DeviceClass::Pedals;
+        result.capabilities = {DeviceCapability::Buttons,DeviceCapability::Axes,DeviceCapability::Calibration,DeviceCapability::Profiles,DeviceCapability::ApplicationRules,DeviceCapability::Diagnostics};
+    } else if (containsAny(product, {"spacemouse", "space mouse", "space navigator", "3dconnexion"})) {
+        result.deviceClass = DeviceClass::SpaceController;
+        result.capabilities = {DeviceCapability::Pointer,DeviceCapability::Buttons,DeviceCapability::Axes,DeviceCapability::Calibration,DeviceCapability::Profiles,DeviceCapability::ApplicationRules,DeviceCapability::Diagnostics};
+    } else if (containsAny(product, {"presenter", "presentation", "clicker", "spotlight"})) {
+        result.deviceClass = DeviceClass::Presenter;
+        result.capabilities = {DeviceCapability::Buttons,DeviceCapability::KeyboardInput,DeviceCapability::Profiles,DeviceCapability::ApplicationRules,DeviceCapability::Diagnostics};
+    } else if (containsAny(product, {"remote control", "remote", "air mouse", "media remote", "rcu"})) {
+        result.deviceClass = DeviceClass::RemoteControl;
+        result.capabilities = {DeviceCapability::Pointer,DeviceCapability::Buttons,DeviceCapability::KeyboardInput,DeviceCapability::Profiles,DeviceCapability::ApplicationRules,DeviceCapability::Diagnostics};
+    } else if (containsAny(product, {"arcade", "fight stick", "fightstick", "dance pad"})) {
+        result.deviceClass = DeviceClass::ArcadeController;
+        result.capabilities = {DeviceCapability::Buttons,DeviceCapability::Axes,DeviceCapability::Calibration,DeviceCapability::Profiles,DeviceCapability::ApplicationRules,DeviceCapability::Diagnostics};
+    } else if (containsAny(product, {"gamepad", "controller", "dualshock", "dualsense", "xbox", "joy-con"})) {
         result.deviceClass = DeviceClass::Gamepad;
         result.capabilities = {
             DeviceCapability::Buttons,
@@ -125,7 +143,7 @@ DeviceCapabilityClassifier::classify(
             DeviceCapability::ApplicationRules,
             DeviceCapability::Diagnostics
         };
-    } else if (containsAny(product, {"joystick"})) {
+    } else if (containsAny(product, {"joystick", "joy stick"})) {
         result.deviceClass = DeviceClass::Joystick;
         result.capabilities = {
             DeviceCapability::Buttons,
@@ -136,7 +154,7 @@ DeviceCapabilityClassifier::classify(
             DeviceCapability::ApplicationRules,
             DeviceCapability::Diagnostics
         };
-    } else if (containsAny(product, {"wheel", "racing wheel"})) {
+    } else if (containsAny(product, {"wheel", "racing wheel", "driving force", "sim wheel"})) {
         result.deviceClass = DeviceClass::SteeringWheel;
         result.capabilities = {
             DeviceCapability::Buttons,
@@ -182,7 +200,7 @@ DeviceCapabilityClassifier::classify(
             DeviceCapability::VendorProtocol,
             DeviceCapability::Diagnostics
         };
-    } else if (containsAny(product, {"mouse", "master"})) {
+    } else if (containsAny(product, {"mouse", "master", "gladius", "aimpoint", "gaming mouse", "vertical mouse", "track mouse"})) {
         result.deviceClass = DeviceClass::Mouse;
         result.capabilities = {
             DeviceCapability::Pointer,
@@ -256,7 +274,7 @@ DeviceCapabilityClassifier::classify(
         };
     }
 
-    if (manufacturer.find("logitech") != std::string::npos) {
+    if (containsAny(manufacturer, {"logitech", "asus", "asustek", "razer", "corsair", "steelseries", "thrustmaster", "fanatec", "moza", "3dconnexion"})) {
         appendUnique(
             result.capabilities,
             DeviceCapability::VendorProtocol

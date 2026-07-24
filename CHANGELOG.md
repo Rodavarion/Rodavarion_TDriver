@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.6 Stable
+
+- Restored live input monitor lifecycle.
+- Added tray recovery after suspend/resume and Plasma shell restart.
+- Added explicit device button-mapping actions while retaining double-click navigation.
+- Expanded HID classification and ASUS ROG Gladius III Wireless AimPoint support.
+- Added per-monitor scaling profile protection for KDE Plasma/KScreen.
+- Improved clean installation, dependency cleanup and full uninstall.
+- Removed automatic desktop shortcut creation.
+
 ## 1.1.5 Stable
 
 - Corrected release numbering after the mistakenly published 1.0.1 package.

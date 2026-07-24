@@ -3,7 +3,8 @@ set -euo pipefail
 
 STATE_DIR="${HOME}/.local/share/rodavarion-tdriver/install"
 MANIFEST_FILE="${STATE_DIR}/managed-files.txt"
-PURGE_DATA=0
+PURGE_DATA=1
+KEEP_DATA=0
 REMOVE_SYSTEM=0
 ASSUME_YES=0
 
@@ -11,8 +12,9 @@ usage() {
     cat <<USAGE
 Безпечна деінсталяція Rodavarion TDriver
 Використання: $0 [--purge-data] [--remove-system-rules] [--yes]
-  без параметрів          видалити програму, зберегти налаштування/профілі/журнали
-  --purge-data            також видалити особисті дані Rodavarion TDriver
+  без параметрів          повністю видалити програму та її дані
+  --keep-data             зберегти налаштування/профілі/журнали
+  --purge-data            явно виконати повне очищення
   --remove-system-rules   запропонувати видалити системні udev/modules-load файли
   --yes                   підтвердити без додаткового запиту
 USAGE
@@ -20,7 +22,8 @@ USAGE
 
 while (($#)); do
     case "$1" in
-        --purge-data) PURGE_DATA=1; shift ;;
+        --purge-data) PURGE_DATA=1; KEEP_DATA=0; shift ;;
+        --keep-data) PURGE_DATA=0; KEEP_DATA=1; shift ;;
         --remove-system-rules) REMOVE_SYSTEM=1; shift ;;
         --yes|-y) ASSUME_YES=1; shift ;;
         --help|-h) usage; exit 0 ;;
@@ -148,7 +151,10 @@ if (( PURGE_DATA )); then
         "${HOME}/.local/share/Rodavarion" \
         "${HOME}/.local/share/rodavarion-tdriver" \
         "${HOME}/.cache/Rodavarion" \
-        "${HOME}/.cache/rodavarion-tdriver"
+        "${HOME}/.cache/rodavarion-tdriver" \
+        "${HOME}/.config/Rodavarion Technologies" \
+        "${HOME}/.local/state/Rodavarion Technologies" \
+        "${HOME}/.local/state/rodavarion-tdriver"
 else
     rm -rf -- "$STATE_DIR"
 fi

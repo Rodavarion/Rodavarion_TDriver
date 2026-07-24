@@ -21,6 +21,7 @@ class QProgressBar;
 class QStackedWidget;
 class QTableWidget;
 class QSystemTrayIcon;
+class QTimer;
 class QString;
 
 namespace rodavarion::runtime {
@@ -46,6 +47,8 @@ private:
     void saveGeneralSettings();
     void updateAutostartEntry(bool enabled);
     void createTrayIcon();
+    void recoverTrayIcon();
+    void checkDisplayScaling();
     void showFromTray();
     void quitApplication();
     void showWelcomeDialogIfNeeded();
@@ -125,6 +128,9 @@ private:
     QMenu* trayMenu_{nullptr};
     bool quitting_{false};
     bool trayHintShown_{false};
+    QTimer* trayRecoveryTimer_{nullptr};
+    QTimer* displayScaleTimer_{nullptr};
+    int lastScreenCount_{0};
 };
 
 } // namespace rodavarion::gui

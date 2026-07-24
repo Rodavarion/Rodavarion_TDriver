@@ -13,6 +13,12 @@ enum class DeviceClass {
     Gamepad,
     Joystick,
     SteeringWheel,
+    FlightController,
+    Pedals,
+    RemoteControl,
+    Presenter,
+    SpaceController,
+    ArcadeController,
     BarcodeScanner,
     DocumentScanner,
     Printer,
@@ -79,6 +85,12 @@ deviceClassName(const DeviceClass value) noexcept {
         case DeviceClass::Gamepad:         return "Gamepad";
         case DeviceClass::Joystick:        return "Joystick";
         case DeviceClass::SteeringWheel:   return "Steering wheel";
+        case DeviceClass::FlightController:return "Flight controller / HOTAS";
+        case DeviceClass::Pedals:          return "Pedals";
+        case DeviceClass::RemoteControl:   return "Remote control";
+        case DeviceClass::Presenter:       return "Presentation controller";
+        case DeviceClass::SpaceController: return "3D / space controller";
+        case DeviceClass::ArcadeController:return "Arcade controller";
         case DeviceClass::BarcodeScanner:  return "Barcode scanner";
         case DeviceClass::DocumentScanner: return "Document scanner";
         case DeviceClass::Printer:         return "Printer";

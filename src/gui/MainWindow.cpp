@@ -19,6 +19,9 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QApplication>
+#include <QRegularExpression>
+#include <QScreen>
+#include <QGuiApplication>
 #include <QCloseEvent>
 #include <QComboBox>
 #include <QCheckBox>
@@ -53,9 +56,11 @@
 #include <QPixmap>
 #include <QIcon>
 #include <QTimer>
+#include <QThread>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QWidget>
+#include <algorithm>
 #include <stdexcept>
 
 namespace rodavarion::gui {
@@ -157,6 +162,29 @@ MainWindow::MainWindow(core::Application& application)
     restoreWindowState();
     createTrayIcon();
 
+    trayRecoveryTimer_ = new QTimer(this);
+    trayRecoveryTimer_->setInterval(5000);
+    connect(trayRecoveryTimer_, &QTimer::timeout, this, &MainWindow::recoverTrayIcon);
+    trayRecoveryTimer_->start();
+    connect(qApp, &QGuiApplication::applicationStateChanged, this, [this](Qt::ApplicationState state) {
+        if (state == Qt::ApplicationActive) {
+            QTimer::singleShot(1200, this, &MainWindow::recoverTrayIcon);
+            QTimer::singleShot(1800, this, &MainWindow::checkDisplayScaling);
+        }
+    });
+
+    lastScreenCount_ = QGuiApplication::screens().size();
+    displayScaleTimer_ = new QTimer(this);
+    displayScaleTimer_->setInterval(7000);
+    connect(displayScaleTimer_, &QTimer::timeout, this, &MainWindow::checkDisplayScaling);
+    displayScaleTimer_->start();
+    connect(qApp, &QGuiApplication::screenAdded, this, [this](QScreen*) {
+        QTimer::singleShot(2200, this, &MainWindow::checkDisplayScaling);
+    });
+    connect(qApp, &QGuiApplication::screenRemoved, this, [this](QScreen*) {
+        QTimer::singleShot(1800, this, &MainWindow::checkDisplayScaling);
+    });
+
     application_.events().subscribe(
         "profiles.saved",
         [this](const event::Event& event) {
@@ -219,7 +247,7 @@ void MainWindow::buildInterface() {
 
     auto* splitter = new QSplitter(Qt::Vertical);
 
-    deviceTable_ = new QTableWidget(0, 8);
+    deviceTable_ = new QTableWidget(0, 9);
     deviceTable_->setHorizontalHeaderLabels({
         "Device",
         "Manufacturer",
@@ -228,7 +256,8 @@ void MainWindow::buildInterface() {
         "Capabilities",
         "Interfaces",
         "Backend",
-        "Status"
+        "Status",
+        "Налаштування"
     });
     deviceTable_->horizontalHeader()->setSectionResizeMode(
         0,
@@ -238,7 +267,7 @@ void MainWindow::buildInterface() {
         4,
         QHeaderView::Stretch
     );
-    for (int column : {1, 2, 3, 5, 6, 7}) {
+    for (int column : {1, 2, 3, 5, 6, 7, 8}) {
         deviceTable_->horizontalHeader()->setSectionResizeMode(
             column,
             QHeaderView::ResizeToContents
@@ -1161,6 +1190,15 @@ void MainWindow::createTrayIcon() {
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         return;
     }
+    if (trayIcon_ != nullptr) {
+        trayIcon_->hide();
+        trayIcon_->deleteLater();
+        trayIcon_ = nullptr;
+    }
+    if (trayMenu_ != nullptr) {
+        trayMenu_->deleteLater();
+        trayMenu_ = nullptr;
+    }
 
     const auto icon = createRodavarionIcon();
     setWindowIcon(icon);
@@ -1218,6 +1256,73 @@ void MainWindow::createTrayIcon() {
     );
 
     trayIcon_->show();
+}
+
+void MainWindow::recoverTrayIcon() {
+    if (quitting_) return;
+    if (!QSystemTrayIcon::isSystemTrayAvailable()) return;
+    if (trayIcon_ == nullptr || !trayIcon_->isVisible()) {
+        createTrayIcon();
+    }
+}
+
+void MainWindow::checkDisplayScaling() {
+    QSettings settings;
+    if (!settings.value("display/preventUnexpected200", true).toBool()) return;
+    const QString doctor = QStandardPaths::findExecutable("kscreen-doctor");
+    if (doctor.isEmpty()) return;
+
+    QProcess process;
+    process.start(doctor, {"-o"});
+    if (!process.waitForFinished(2500)) return;
+    const QString output = QString::fromUtf8(process.readAllStandardOutput());
+    const QRegularExpression block(
+        R"(Output:\s*(\d+)\s+([^\s]+)[\s\S]*?Scale:\s*([0-9]+(?:\.[0-9]+)?))",
+        QRegularExpression::MultilineOption
+    );
+    auto match = block.globalMatch(output);
+    QStringList commands;
+    const int screenCount = QGuiApplication::screens().size();
+    while (match.hasNext()) {
+        const auto m = match.next();
+        const QString id = m.captured(1);
+        const QString name = m.captured(2);
+        const double scale = m.captured(3).toDouble();
+        const QString key = "display/outputScale/" + name;
+        if (settings.contains(key)) {
+            const double expected = settings.value(key).toDouble();
+            if (qAbs(scale - expected) > 0.24) {
+                commands << QString("output.%1.scale.%2").arg(id).arg(expected, 0, 'f', 2);
+            }
+            continue;
+        }
+        double dpi = 96.0;
+        for (QScreen* screen : QGuiApplication::screens()) {
+            if (screen->name() == name || name.contains(screen->name()) || screen->name().contains(name)) {
+                dpi = screen->physicalDotsPerInch();
+                break;
+            }
+        }
+        // A newly connected ordinary-density display should not silently jump to 200%.
+        const double remembered = (scale >= 1.95 && dpi < 170.0) ? 1.0 : scale;
+        settings.setValue(key, remembered);
+        if (qAbs(scale - remembered) > 0.24) {
+            commands << QString("output.%1.scale.%2").arg(id).arg(remembered, 0, 'f', 2);
+        }
+    }
+    settings.sync();
+    lastScreenCount_ = screenCount;
+    if (!commands.isEmpty()) {
+        QProcess::startDetached(doctor, commands);
+        if (trayIcon_ != nullptr && trayIcon_->isVisible()) {
+            trayIcon_->showMessage(
+                "Rodavarion TDriver — монітори",
+                "Відновлено збережений масштаб екранів. Змінити правило можна у конфігурації TDriver.",
+                QSystemTrayIcon::Information,
+                4000
+            );
+        }
+    }
 }
 
 void MainWindow::showFromTray() {
@@ -1417,6 +1522,26 @@ void MainWindow::refreshDevices() {
                     : (i18n::LocalizationService::instance().effectiveLanguage() == i18n::Language::Ukrainian ? "Тестовий пристрій" : "Test device")
             )
         );
+        const bool configurable = std::find(
+            peripheral.classification.capabilities.begin(),
+            peripheral.classification.capabilities.end(),
+            capability::DeviceCapability::Buttons
+        ) != peripheral.classification.capabilities.end();
+        auto* configureButton = new QPushButton(
+            i18n::LocalizationService::instance().effectiveLanguage() == i18n::Language::Ukrainian
+                ? "Налаштувати кнопки"
+                : "Configure buttons",
+            deviceTable_
+        );
+        configureButton->setEnabled(configurable && device.hasRealBackend());
+        configureButton->setToolTip(configurable
+            ? "Відкрити вікно призначення кнопок. Подвійний клік по рядку також працює."
+            : "Цей пристрій не повідомляє про кнопки через HID/evdev.");
+        connect(configureButton, &QPushButton::clicked, this, [this, row]() {
+            deviceTable_->selectRow(row);
+            openSelectedPeripheral();
+        });
+        deviceTable_->setCellWidget(row, 8, configureButton);
     }
 
     if (!peripherals_.empty()) {
@@ -1568,11 +1693,13 @@ void MainWindow::openSelectedPeripheral() {
     const auto& peripheral =
         peripherals_[static_cast<std::size_t>(row)];
 
-    if (peripheral.classification.deviceClass
-        != capability::DeviceClass::Mouse) {
-        statusLabel_->setText(
-            i18n::LocalizationService::instance().text("status.mouse_only")
-        );
+    const bool hasButtons = std::find(
+        peripheral.classification.capabilities.begin(),
+        peripheral.classification.capabilities.end(),
+        capability::DeviceCapability::Buttons
+    ) != peripheral.classification.capabilities.end();
+    if (!hasButtons) {
+        statusLabel_->setText("Для цього пристрою не виявлено кнопок, доступних для налаштування.");
         return;
     }
 
@@ -1584,7 +1711,14 @@ void MainWindow::openSelectedPeripheral() {
     // the installed service is active. The service is restarted afterwards.
     QProcess serviceControl;
     serviceControl.start("systemctl", {"--user", "stop", "rodavarion-tdriverd.service"});
-    serviceControl.waitForFinished(3000);
+    serviceControl.waitForFinished(8000);
+    for (int attempt = 0; attempt < 20; ++attempt) {
+        QProcess state;
+        state.start("systemctl", {"--user", "is-active", "--quiet", "rodavarion-tdriverd.service"});
+        state.waitForFinished(500);
+        if (state.exitCode() != 0) break;
+        QThread::msleep(100);
+    }
 
     if (mouseRuntime_ != nullptr) {
         mouseRuntime_->stop();

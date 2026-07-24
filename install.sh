@@ -55,6 +55,10 @@ install_args=(--edition "$EDITION")
 (( ASSUME_YES )) && install_args+=(--yes)
 "${ROOT_DIR}/tools/install_user.sh" "${install_args[@]}"
 
+# Видаляються лише пакети, які цей запуск поставив для збірки, які не потрібні
+# runtime TDriver і які pacman підтвердив як осиротілі.
+"${ROOT_DIR}/tools/cleanup_install_dependencies.sh"
+
 echo
 echo "Установлення успішно завершено."
 if [[ "$EDITION" == "full" ]]; then

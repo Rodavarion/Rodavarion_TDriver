@@ -68,6 +68,7 @@ if (( ${#missing[@]} > 0 )); then
 
     if [[ "${answer}" =~ ^[YyТт]$ ]]; then
         sudo pacman -S --needed "${missing[@]}"
+        ((${#missing[@]})) && sudo pacman -D --asdeps "${missing[@]}" >/dev/null || true
     else
         echo "Встановлення скасовано."
         exit 4
