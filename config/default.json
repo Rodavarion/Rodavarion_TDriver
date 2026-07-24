@@ -1,7 +1,7 @@
 {
   "application": {
     "name": "Rodavarion TDriver",
-    "version": "1.0.0",
+    "version": "1.1.6",
     "language": "auto"
   },
   "company": {
@@ -74,5 +74,5 @@
     "auto_detect_device_profiles": true,
     "offer_reinstall_on_new_device": true
   },
-  "version": "1.0.0"
+  "version": "1.1.6"
 }

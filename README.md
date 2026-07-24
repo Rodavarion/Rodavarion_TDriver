@@ -80,7 +80,7 @@ chmod +x tools/*.sh
 
 ## Project status · Стан проєкту
 
-Version **1.0.1 Stable** is the current public release; it contains critical runtime correctness and latency fixes over 1.0.0. Development is currently led by **DevSwiftPro**, a Ukrainian veteran enthusiast. Rodavarion Technologies is being established. Contributions and responsible issue reports are welcome.
+Version **1.1.6 Stable** is the current public release; it contains critical runtime correctness and latency fixes over 1.0.0. Development is currently led by **DevSwiftPro**, a Ukrainian veteran enthusiast. Rodavarion Technologies is being established. Contributions and responsible issue reports are welcome.
 
 ## Український опис
 
